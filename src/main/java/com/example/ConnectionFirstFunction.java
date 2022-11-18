@@ -14,7 +14,7 @@ import redis.clients.jedis.Jedis;
 public class ConnectionFirstFunction implements RequestHandler<APIGatewayV2WebSocketEvent, APIGatewayV2WebSocketResponse> {
 
     private static final CacheUtils cache = new CacheUtils(System.getenv("HOST"),
-            Integer.valueOf(System.getenv("PORT")));
+            Integer.valueOf(System.getenv("GET")));
 
 
     @Override

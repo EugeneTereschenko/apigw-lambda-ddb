@@ -14,10 +14,22 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GetAllConnectionFunction implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+
+    private static final CacheUtils cache = new CacheUtils(System.getenv("HOST"),
+            Integer.valueOf(System.getenv("PORT")));
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
-        //Return all connected username
+        LambdaLogger logger = context.getLogger();
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
-            return response.withStatusCode(200).withBody("message");
+
+        try {
+            Set<String> keys = cache.getClient().keys(CacheUtils.PREFIX_CONNECTION_PLAYER + "*");
+            List<String> users = keys.stream().map(s -> s.substring(s.indexOf(":") + 1)).collect(Collectors.toList());
+            return response.withStatusCode(200).withBody(RequestHelper.writeToBody(users));
+        } catch (NumberFormatException | IOException e){
+            logger.log(e.getMessage());
+            return response.withStatusCode(400);
+        }
+
     }
 }
